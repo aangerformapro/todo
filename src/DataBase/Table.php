@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace DataBase;
 
-class Table
+class Table implements \IteratorAggregate
 {
     protected string $name = '';
-
-    protected string $dir  = '';
 
     public function __construct(string $name)
     {
         $this->name = $name;
-        $this->dir  = DATA_DIR . DIRECTORY_SEPARATOR . $name;
+
+        @mkdir(self::getPath($name), 0777, true);
     }
 
     public function getIDs(): array
@@ -25,6 +24,25 @@ class Table
         return array_map(fn ($f) => mb_substr($f, 0, -5), $files);
     }
 
+    public function getIterator(): \Traversable
+    {
+        yield from $this->getRecords();
+    }
+
+    public function getRecords(): array
+    {
+        $ids     = $this->getIDs();
+
+        $results = [];
+
+        foreach ($ids as $id)
+        {
+            $results[] = $this->getRecord($id);
+        }
+
+        return $results;
+    }
+
     public function getRecord(string $id): ?array
     {
         $file = self::getPath($this->name, $id);
@@ -34,14 +52,14 @@ class Table
             return null;
         }
 
-        return json_decode(file_get_contents($file));
+        return json_decode(file_get_contents($file), true);
     }
 
     public function updateRecord(string $id, array $record): bool
     {
         $file         = self::getPath($this->name, $id);
         $record['id'] = $id;
-        return file_put_contents(json_encode($record), $file) > 0;
+        return file_put_contents($file, json_encode($record)) > 0;
     }
 
     public function addRecord(array $record): bool
@@ -62,7 +80,7 @@ class Table
 
         if ( ! is_null($id))
         {
-            $result .= "{$id}.json";
+            $result .= DIRECTORY_SEPARATOR . "{$id}.json";
         }
 
         return $result;
