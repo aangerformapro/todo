@@ -111,4 +111,5 @@
     "markdown.preview.fontSize": 16,
     "phpTools.language": "en",
     "telemetry.telemetryLevel": "off",
+    "php.version": "v7.4",
 }
