@@ -1,11 +1,15 @@
 {
     "require": {
         "symfony/polyfill-php80": "^1.27",
-        "symfony/polyfill-php81": "^1.27"
+        "symfony/polyfill-php81": "^1.27",
+        "voku/anti-xss": "^4.1"
     },
     "autoload": {
         "psr-4": {
             "": "src/"
-        }
+        },
+        "files": [
+            "src/functions.php"
+        ]
     }
 }

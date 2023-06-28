@@ -86,7 +86,3 @@ class Table implements \IteratorAggregate
         return $result;
     }
 }
-
-$a = new Table('table');
-
-var_dump($a->getRecord('dffjkdjfdjk'));

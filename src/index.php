@@ -6,7 +6,19 @@ use DataBase\Table;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-require_once __DIR__ . '/constants.php';
+$table     = new Table('todo');
 
-$table = new Table('todo');
-var_dump($table->getRecords());
+$newRecord = false;
+
+if (isset($_POST['name']))
+{
+}
+
+// var_dump($table->getRecords());
+
+if (isset($_POST['endDate']))
+{
+    var_dump(date_create($_POST['endDate']));
+}
+
+echo loadView('todo');
