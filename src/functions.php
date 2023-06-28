@@ -20,6 +20,8 @@ function loadView(string $view, array $data = []): string
     if (is_file(TEMPLATES . DIRECTORY_SEPARATOR . $view))
     {
         chdir(dirname($file));
+
+        var_dump($data);
         extract($data);
 
         include TEMPLATES . DIRECTORY_SEPARATOR . $view;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DataBase;
 
-class Table implements \IteratorAggregate
+class Table implements \IteratorAggregate, \Countable
 {
     protected string $name = '';
 
@@ -22,6 +22,11 @@ class Table implements \IteratorAggregate
         $files = array_filter($files, fn ($f) => str_ends_with($f, '.json'));
 
         return array_map(fn ($f) => mb_substr($f, 0, -5), $files);
+    }
+
+    public function count()
+    {
+        return count($this->getIDs());
     }
 
     public function getIterator(): \Traversable

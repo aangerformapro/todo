@@ -12,6 +12,15 @@ include 'page/header.php'; ?>
 
             <h4>Ajouter une tâche</h4>
 
+            <?php if($newRecord): ?>
+
+                <div class="alert alert-success" role="alert">
+                    Votre tâche à été ajoutée
+                </div>
+
+
+            <?php endif; ?>
+
             <div class="mb-3">
                 <label for="name" class="form-label">Nom de la tâche</label>
                 <input type="text" class="form-control" id="name" name="name" placeholder="Nom de la tâche" required>
@@ -31,16 +40,9 @@ include 'page/header.php'; ?>
                 <button type="submit" class="btn btn-outline-primary">Ajouter</button>
             </div>
 
-
-
-            <?php var_dump($_POST); ?>
-
-
-
-
-            </form>
-        </div>
+        </form>
     </div>
+</div>
 
 
 
