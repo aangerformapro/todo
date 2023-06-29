@@ -2,17 +2,24 @@
 
 declare(strict_types=1);
 
-use DataBase\Table;
-use voku\helper\AntiXSS;
+use DataBase\FichierUnique;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-$table     = new Table('todo');
+session_start();
 
-$antiXss   = new AntiXSS();
+$table     = new FichierUnique('todo');
 
-$newRecord = $isRemoved = false;
-$error     = null;
+$newRecord = $_SESSION['newRecord'] ??= false;
+$modRecord = $_SESSION['modRecord'] ??= false;
+$isRemoved = $_SESSION['isRemoved'] ??= false;
+$error     = $_SESSION['error']     ??= null;
+$inputdata = [];
+
+if ($newRecord || $isRemoved || $error)
+{
+    unset($_SESSION['isRemoved'], $_SESSION['error'], $_SESSION['newRecord'], $_SESSION['modRecord']);
+}
 
 $now       = date_create('now');
 
@@ -26,20 +33,43 @@ if ('add' === $action)
     {
         if (null === $value)
         {
-            $error = 'Tous les champs n\' ont pas été remplis';
+            $_SESSION['error'] = $error = 'Tous les champs n\' ont pas été remplis';
             break;
         }
     }
 
     if (isExpired($data['end_date']))
     {
-        $error = 'Vous ne pouvez pas créer une tâche à effectuer dans le passé !!!';
+        $_SESSION['error'] = $error = 'Vous ne pouvez pas créer une tâche à effectuer dans le passé !!!';
     }
 
     if ( ! $error)
     {
-        $data['done'] = false;
-        $newRecord    = $table->addRecord($data);
+        $data['done']          = false;
+        $_SESSION['newRecord'] = $newRecord = $table->addRecord($data);
+
+        header('Location: ./');
+    }
+}
+
+if ('edit' === $action)
+{
+    if ($id = getPostdata(['id'])['id'])
+    {
+        $newdata = getPostdata(['name', 'description', 'end_date']);
+
+        if ($_SESSION['modRecord'] = $table->updateRecord($id, $newdata))
+        {
+            header('Location: ./');
+        }
+    }
+}
+
+if ('edit_entry' === $action)
+{
+    if ($id = getPostdata(['id'])['id'])
+    {
+        $inputdata = $table->getRecord($id) ?? [];
     }
 }
 
@@ -49,7 +79,32 @@ if ('update' === $action)
 
     $newdata = ['done' => 'on' === $data['done']];
 
-    $table->updateRecord($data['id'], $newdata);
+    if ($table->updateRecord($data['id'], $newdata))
+    {
+        header('Location: ./');
+    }
 }
 
-echo loadView('todo', ['newRecord' => $newRecord, 'isRemoved' => $isRemoved, 'tasks' => $table, 'error' => $error]);
+if ('delete' === $action)
+{
+    $id = getPostdata(['id'])['id'];
+
+    if ($id)
+    {
+        $isRemoved = $table->removeRecord($id);
+    }
+
+    if ($_SESSION['isRemoved'] = $isRemoved)
+    {
+        header('Location: ./');
+    }
+}
+
+echo loadView('todo', [
+    'modRecord' => $modRecord,
+    'inputdata' => $inputdata,
+    'newRecord' => $newRecord,
+    'isRemoved' => $isRemoved,
+    'tasks'     => $table,
+    'error'     => $error,
+]);
