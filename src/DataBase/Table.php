@@ -17,14 +17,33 @@ class Table implements \IteratorAggregate, \Countable
 
     public function getIDs(): array
     {
+        $ids   = [];
         $dir   = self::getPath($this->name);
         $files = scandir($dir) ?: [];
         $files = array_filter($files, fn ($f) => str_ends_with($f, '.json'));
 
-        return array_map(fn ($f) => mb_substr($f, 0, -5), $files);
+        foreach ($files as $file)
+        {
+            $path  = $dir . DIRECTORY_SEPARATOR . $file;
+
+            $id    = mb_substr($file, 0, -5);
+
+            $ctime = @filectime($path);
+
+            if ( ! $ctime)
+            {
+                $ids[] = $id;
+            } else
+            {
+                $ids[$ctime] = $id;
+            }
+        }
+
+        ksort($ids);
+        return array_values($ids);
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->getIDs());
     }
@@ -32,6 +51,11 @@ class Table implements \IteratorAggregate, \Countable
     public function getIterator(): \Traversable
     {
         yield from $this->getRecords();
+    }
+
+    public function hasRecord(string $id): bool
+    {
+        return is_file(self::getPath($this->name, $id));
     }
 
     public function getRecords(): array
@@ -62,14 +86,27 @@ class Table implements \IteratorAggregate, \Countable
 
     public function updateRecord(string $id, array $record): bool
     {
-        $file         = self::getPath($this->name, $id);
-        $record['id'] = $id;
-        return file_put_contents($file, json_encode($record)) > 0;
+        if ( ! $this->hasRecord($id))
+        {
+            return false;
+        }
+        $old                     = $this->getRecord($id);
+        $file                    = self::getPath($this->name, $id);
+        $newRecord               = array_replace($old, $record);
+        $newRecord['updated_at'] = formatTime(date_create('now'));
+        return @file_put_contents($file, json_encode($newRecord)) > 0;
     }
 
     public function addRecord(array $record): bool
     {
-        return $this->updateRecord(uniqid(), $record);
+        $record['created_at'] = $record['updated_at'] = formatTime(date_create('now'));
+        $id                   = $record['id'] = uniqid();
+
+        return
+               @file_put_contents(
+                   self::getPath($this->name, $id),
+                   json_encode($record)
+               ) > 0;
     }
 
     public function removeRecord(string $id): bool

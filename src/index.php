@@ -11,24 +11,45 @@ $table     = new Table('todo');
 
 $antiXss   = new AntiXSS();
 
-$newRecord = false;
+$newRecord = $isRemoved = false;
+$error     = null;
 
-if (isset($_POST['name']))
+$now       = date_create('now');
+
+$action    = getPostdata(['action'])['action'];
+
+if ('add' === $action)
 {
-    $formData  = [
-        'name'        => $antiXss->xss_clean($_POST['name']),
-        'description' => $antiXss->xss_clean($_POST['description']),
-        'endDate'     => $antiXss->xss_clean($_POST['endDate']),
-    ];
+    $data = getPostdata(['name', 'description', 'end_date']);
 
-    $newRecord = $table->addRecord($formData);
+    foreach ($data as $value)
+    {
+        if (null === $value)
+        {
+            $error = 'Tous les champs n\' ont pas été remplis';
+            break;
+        }
+    }
+
+    if (isExpired($data['end_date']))
+    {
+        $error = 'Vous ne pouvez pas créer une tâche à effectuer dans le passé !!!';
+    }
+
+    if ( ! $error)
+    {
+        $data['done'] = false;
+        $newRecord    = $table->addRecord($data);
+    }
 }
 
-// var_dump($table->getRecords());
+if ('update' === $action)
+{
+    $data    = getPostdata(['id', 'done']);
 
-// if (isset($_POST['endDate']))
-// {
-//     var_dump(date_create($_POST['endDate']));
-// }
+    $newdata = ['done' => 'on' === $data['done']];
 
-echo loadView('todo', ['newRecord' => $newRecord, 'tasks' => $table]);
+    $table->updateRecord($data['id'], $newdata);
+}
+
+echo loadView('todo', ['newRecord' => $newRecord, 'isRemoved' => $isRemoved, 'tasks' => $table, 'error' => $error]);
