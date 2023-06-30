@@ -48,29 +48,34 @@ include 'page/header.php'; ?>
                 required>
             </div>
 
-            <?php if($newRecord): ?>
+            <div class="notifications">
+                <?php if($newRecord): ?>
 
-                <div class="alert alert-success" role="alert">
-                    Votre tâche à été ajoutée
-                </div>
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        Votre tâche à été ajoutée
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
 
-            <?php elseif($isRemoved): ?>
+                <?php elseif($isRemoved): ?>
 
-                <div class="alert alert-success" role="alert">
-                    Votre tâche à été supprimée
-                </div>
-            <?php elseif($modRecord): ?>
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        Votre tâche à été supprimée
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php elseif($modRecord): ?>
 
-                <div class="alert alert-success" role="alert">
-                    Votre tâche à été modifiée
-                </div>
-            <?php elseif($error): ?>
-                
-                <div class="alert alert-danger" role="alert">
-                    <?= $error; ?>
-                </div>
-            <?php endif; ?>
-
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        Votre tâche à été modifiée
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php elseif($error): ?>
+                    
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <?= $error; ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?>
+            </div>
             <div class="d-flex justify-content-end align-items-center">
                 <?php if( ! empty($inputdata)):?>
                     <input type="hidden" name="id" value="<?= $inputdata['id']; ?>">

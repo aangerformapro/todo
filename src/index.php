@@ -14,12 +14,15 @@ $newRecord = $_SESSION['newRecord'] ??= false;
 $modRecord = $_SESSION['modRecord'] ??= false;
 $isRemoved = $_SESSION['isRemoved'] ??= false;
 $error     = $_SESSION['error']     ??= null;
-$inputdata = [];
+$inputdata = $_SESSION['inputdata'] ??= [];
 
-if ($newRecord || $isRemoved || $error)
-{
-    unset($_SESSION['isRemoved'], $_SESSION['error'], $_SESSION['newRecord'], $_SESSION['modRecord']);
-}
+unset(
+    $_SESSION['isRemoved'],
+    $_SESSION['error'],
+    $_SESSION['newRecord'],
+    $_SESSION['modRecord'],
+    $_SESSION['inputdata']
+);
 
 $now       = date_create('now');
 
@@ -58,6 +61,16 @@ if ('edit' === $action)
     {
         $newdata = getPostdata(['name', 'description', 'end_date']);
 
+        if (isExpired($newdata['end_date']))
+        {
+            $_SESSION['inputdata'] = $table->getRecord($id) ?? [];
+
+            $_SESSION['error']     = $error = 'Vous ne pouvez pas créer une tâche à effectuer dans le passé !!!';
+            header('Location: ./');
+
+            exit;
+        }
+
         if ($_SESSION['modRecord'] = $table->updateRecord($id, $newdata))
         {
             header('Location: ./');
@@ -69,7 +82,8 @@ if ('edit_entry' === $action)
 {
     if ($id = getPostdata(['id'])['id'])
     {
-        $inputdata = $table->getRecord($id) ?? [];
+        $_SESSION['inputdata'] = $table->getRecord($id) ?? [];
+        header('Location: ./');
     }
 }
 

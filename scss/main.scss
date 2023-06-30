@@ -19,3 +19,16 @@ html {
 body {
     min-height: 100vh;
 }
+
+.alert-dismissible {
+    transition-duration: 0.75s;
+
+    &.dismiss {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+template {
+    display: none !important;
+}
