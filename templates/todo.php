@@ -41,14 +41,25 @@ include 'page/header.php'; ?>
                 <input 
                 type="datetime-local" 
                 class="form-control" 
-                id="end_date" 
                 name="end_date" 
                 placeholder="Date limite" 
                 value="<?= $inputdata['end_date']    ?? ''; ?>"
                 required>
             </div>
 
-            <div class="notifications">
+            
+            <div class="d-flex justify-content-end align-items-center">
+                <?php if( ! empty($inputdata)):?>
+                    <input type="hidden" name="id" value="<?= $inputdata['id']; ?>">
+                    <button type="submit" class="btn btn-outline-primary" name="action" value="edit">Modifier</button>
+
+
+                <?php else: ?>
+                    <button type="submit" class="btn btn-outline-primary" name="action" value="add">Ajouter</button>
+                <?php endif; ?>
+            </div>
+
+            <div class="notifications my-3">
                 <?php if($newRecord): ?>
 
                     <div class="alert alert-success alert-dismissible" role="alert">
@@ -76,18 +87,6 @@ include 'page/header.php'; ?>
                     </div>
                 <?php endif; ?>
             </div>
-            <div class="d-flex justify-content-end align-items-center">
-                <?php if( ! empty($inputdata)):?>
-                    <input type="hidden" name="id" value="<?= $inputdata['id']; ?>">
-                    <button type="submit" class="btn btn-outline-primary" name="action" value="edit">Modifier</button>
-
-
-                <?php else: ?>
-                    <button type="submit" class="btn btn-outline-primary" name="action" value="add">Ajouter</button>
-                <?php endif; ?>
-            </div>
-
-
             
 
         </form>
@@ -124,13 +123,14 @@ include 'page/header.php'; ?>
 
                     <tr class="<?= $done ? 'table-success' : ''; ?><?= $expired ? 'table-danger" title="La tâche à expiré' : ''; ?>">
                         <td class="col-1">
-                            
-                            <form action="./" method="post">
+                           
+                            <form action="./" method="post" class="d-flex align-items-center py-1">
                                 <input type="hidden" name="action" value="update">
                                 <input type="hidden" name="id" value="<?= $task['id']; ?>">
                                 <div class="form-check form-switch">
                                     <input 
                                     class="form-check-input" 
+                                    aria-label="Valide la tâche"
                                     type="checkbox" 
                                     role="switch" 
                                     name="done"
@@ -139,37 +139,51 @@ include 'page/header.php'; ?>
                                     onchange="this.form.submit()">
                                 </div>
                             </form>
+                          
                         </td>
-                        <td class="col-3"><?= $task['name']; ?></td>
-                        <td class="col-4"><?= $task['description']; ?></td>
+                        <td class="col-3">
+                            <div class="d-flex align-items-center py-1">
+                                <?= $task['name']; ?>
+                            </div>
+                        </td>
+                        <td class="col-4">
+                            <div class="d-flex align-items-center py-1">
+                                <?= $task['description']; ?>
+                            </div>
+                        </td>
                         <td class="col-2">
-                            <input 
-                                type="datetime-local" 
-                                class="form-control form-control-sm" 
-                                id="end_date" 
-                                value="<?= $task['end_date']; ?>"
-                                disabled>
+                            <div class="d-flex align-items-center py-1">
+                                <input 
+                                    aria-label="Exécuter avant"
+                                    type="datetime-local" 
+                                    class="form-control form-control-sm" 
+                                    name="end_date" 
+                                    value="<?= $task['end_date']; ?>"
+                                    disabled>
+                            </div>
                         </td>
 
                         <td class="col-2 text-end">
-                            <form method="post" action="./">
-                                <input type="hidden" name="id" value="<?= $task['id']; ?>">
-                                <button 
-                                    type="submit" 
-                                    name="action" 
-                                    value="edit_entry" 
-                                    title="Editer la tâche"
-                                    class="btn btn-secondary btn-sm"
-                                >✎</button>
-                                
-                                <button 
-                                    type="submit" 
-                                    name="action" 
-                                    value="delete" 
-                                    title="Supprimer la tâche"
-                                    class="btn btn-danger btn-sm"
-                                >&times;</button>
-                            </form>
+                            <div class="d-flex align-items-center py-1">
+                                <form method="post" action="./">
+                                    <input type="hidden" name="id" value="<?= $task['id']; ?>">
+                                    <button 
+                                        type="submit" 
+                                        name="action" 
+                                        value="edit_entry" 
+                                        title="Editer la tâche"
+                                        class="btn btn-secondary btn-sm"
+                                    >✎</button>
+                                    
+                                    <button 
+                                        type="submit" 
+                                        name="action" 
+                                        value="delete" 
+                                        title="Supprimer la tâche"
+                                        class="btn btn-danger btn-sm"
+                                    >&times;</button>
+                                </form>
+                            </div>
                         </td>
 
                     </tr>
