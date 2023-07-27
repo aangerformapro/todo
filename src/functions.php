@@ -36,6 +36,11 @@ function formatTime(DateTime $date): string
     return $date->format('Y-m-d') . 'T' . $date->format('H:i');
 }
 
+function formatTimeSQL(DateTime $date): string
+{
+    return $date->format('Y-m-d G:i:s');
+}
+
 function getPostdata(array $keys = []): array
 {
     static $xss;

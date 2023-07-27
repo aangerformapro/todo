@@ -2,13 +2,20 @@
 
 declare(strict_types=1);
 
-use DataBase\FichierUnique;
+use DataBase\MySQLDatabase;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 session_start();
 
-$table     = new FichierUnique('todo');
+$table     = new MySQLDatabase(
+    'todo',
+    include __DIR__ . '/config.php'
+);
+
+var_dump($table->getRecord(1));
+
+exit;
 
 $newRecord = $_SESSION['newRecord'] ??= false;
 $modRecord = $_SESSION['modRecord'] ??= false;
