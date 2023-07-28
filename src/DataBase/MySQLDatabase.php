@@ -50,7 +50,76 @@ class MySQLDatabase implements \IteratorAggregate, \Countable
 
     public function addRecord(array $record): bool
     {
+        $this->entries        = null;
+
         $record['created_at'] = $record['updated_at'] = formatTimeSQL(date_create('now'));
+        $record['end_date']   = formatTimeSQL(date_create($record['end_date']));
+        $record['done']       = (int) $record['done'];
+
+        $query                = sprintf(
+            'INSERT INTO %s (name, description, done, end_date, updated_at, created_at) ' .
+            'VALUES ( :name, :description, :done, :end_date, :updated_at, :created_at )',
+            $this->name
+        );
+        $stmt                 = $this->connection->prepare($query);
+
+        foreach ($record as $key => $value)
+        {
+            $stmt->bindValue($key, $value);
+        }
+
+        return $stmt->execute();
+    }
+
+    public function updateRecord($id, array $record): bool
+    {
+        $this->entries        = null;
+        $record['updated_at'] = formatTimeSQL(date_create('now'));
+        $query                = sprintf(
+            'UPDATE %s SET ',
+            $this->name
+        );
+
+        $params               = [];
+
+        foreach (array_keys($record) as $key)
+        {
+            $params[] = sprintf('%s = :%s', $key, $key);
+        }
+        $query .= implode(', ', $params);
+        $query .= ' WHERE id=:id';
+
+        $record['id']         = $id;
+
+        $stmt                 = $this->connection->prepare($query);
+
+        foreach ($record as $key => $value)
+        {
+            if ('done' === $key)
+            {
+                $value = (int) $value;
+            } elseif ('end_date' === $key)
+            {
+                $value = formatTimeSQL(date_create($value));
+            }
+
+            $stmt->bindValue($key, $value);
+        }
+
+        return $stmt->execute();
+    }
+
+    public function removeRecord($id): bool
+    {
+        $this->entries = null;
+        $stmt          = $this->connection->prepare(sprintf(
+            'DELETE FROM %s WHERE id=:id',
+            $this->name
+        ));
+
+        $stmt->bindValue('id', $id);
+
+        return $stmt->execute();
     }
 
     protected function connectDatabase(array $config): \PDO
@@ -104,7 +173,7 @@ class MySQLDatabase implements \IteratorAggregate, \Countable
                     {
                         if (in_array($row, ['created_at', 'updated_at', 'end_date']))
                         {
-                            $value = date_create($value);
+                            $value = formatTime(date_create($value));
                         } elseif ('done' === $row)
                         {
                             $value = (bool) $value;

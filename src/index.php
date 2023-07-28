@@ -13,10 +13,6 @@ $table     = new MySQLDatabase(
     include __DIR__ . '/config.php'
 );
 
-var_dump($table->getRecord(1));
-
-exit;
-
 $newRecord = $_SESSION['newRecord'] ??= false;
 $modRecord = $_SESSION['modRecord'] ??= false;
 $isRemoved = $_SESSION['isRemoved'] ??= false;
