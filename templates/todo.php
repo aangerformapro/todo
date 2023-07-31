@@ -8,12 +8,10 @@ include 'page/header.php'; ?>
 
    
     <div class="col-lg-4 p-3">
-        <form action="./" method="post" class="w-100">
+        
 
+        <form action="./" method="post" class="w-100 form-add" <?= empty($inputdata) ? '' : 'hidden'; ?>>
             <h4>Ajouter une tâche</h4>
-
-            
-
             <div class="mb-3">
                 <label for="name" class="form-label d-none">Nom de la tâche</label>
                 <input 
@@ -21,7 +19,7 @@ include 'page/header.php'; ?>
                 class="form-control" 
                 id="name" name="name" 
                 placeholder="Nom de la tâche" 
-                value="<?= $inputdata['name']        ?? ''; ?>"
+                value=""
                 required>
             </div>
             <div class="mb-3">
@@ -31,7 +29,7 @@ include 'page/header.php'; ?>
                 class="form-control" 
                 id="description" name="description" 
                 placeholder="Description de la tâche" 
-                value="<?= $inputdata['description'] ?? ''; ?>"
+                value=""
                 required>
             </div>
 
@@ -43,53 +41,84 @@ include 'page/header.php'; ?>
                 class="form-control" 
                 name="end_date" 
                 placeholder="Date limite" 
-                value="<?= $inputdata['end_date']    ?? ''; ?>"
+                value=""
                 required>
             </div>
 
-            
             <div class="d-flex justify-content-end align-items-center">
-                <?php if( ! empty($inputdata)):?>
-                    <input type="hidden" name="id" value="<?= $inputdata['id']; ?>">
-                    <button type="submit" class="btn btn-outline-primary" name="action" value="edit">Modifier</button>
-
-
-                <?php else: ?>
-                    <button type="submit" class="btn btn-outline-primary" name="action" value="add">Ajouter</button>
-                <?php endif; ?>
+                <button type="submit" class="btn btn-outline-primary" name="action" value="add">Ajouter</button>
             </div>
-
-            <div class="notifications my-3">
-                <?php if($newRecord): ?>
-
-                    <div class="alert alert-success alert-dismissible" role="alert">
-                        Votre tâche à été ajoutée
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-
-                <?php elseif($isRemoved): ?>
-
-                    <div class="alert alert-success alert-dismissible" role="alert">
-                        Votre tâche à été supprimée
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                <?php elseif($modRecord): ?>
-
-                    <div class="alert alert-success alert-dismissible" role="alert">
-                        Votre tâche à été modifiée
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                <?php elseif($error): ?>
-                    
-                    <div class="alert alert-danger alert-dismissible" role="alert">
-                        <?= $error; ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                <?php endif; ?>
-            </div>
-            
 
         </form>
+        <form action="./" method="post" class="w-100 form-mod" <?= empty($inputdata) ? 'hidden' : ''; ?>>
+            <h4>Modifier une tâche</h4>
+            <div class="mb-3">
+                <label for="name" class="form-label d-none">Nom de la tâche</label>
+                <input 
+                type="text" 
+                class="form-control" 
+                id="name" name="name" 
+                placeholder="Nom de la tâche" 
+                value="<?= $inputdata['name']                          ?? ''; ?>"
+                required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label d-none">Description</label>
+                <input 
+                type="text" 
+                class="form-control" 
+                id="description" name="description" 
+                placeholder="Description de la tâche" 
+                value="<?= $inputdata['description']                   ?? ''; ?>"
+                required>
+            </div>
+
+
+            <div class="mb-3">
+                <label for="endDate" class="form-label d-none">Date limite</label>
+                <input 
+                type="datetime-local" 
+                class="form-control" 
+                name="end_date" 
+                placeholder="Date limite" 
+                value="<?= $inputdata['end_date']                      ?? ''; ?>"
+                required>
+            </div>
+
+            <input type="hidden" name="id" value="<?= $inputdata['id'] ?? ''; ?>">
+            <div class="d-flex justify-content-end align-items-center">
+                <button type="submit" class="btn btn-outline-primary" name="action" value="edit">Modifier</button>
+            </div>
+        </form>
+        <div class="notifications my-3">
+            <?php if($newRecord): ?>
+
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    Votre tâche à été ajoutée
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+            <?php elseif($isRemoved): ?>
+
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    Votre tâche à été supprimée
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php elseif($modRecord): ?>
+
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    Votre tâche à été modifiée
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php elseif($error): ?>
+                
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <?= $error; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
+        </div>
+
     </div>
     
     <div class="col-12 col-lg-8 p-3">

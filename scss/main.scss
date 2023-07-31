@@ -24,11 +24,12 @@ body {
     transition-duration: 0.75s;
 
     &.dismiss {
-        transform: scale(0);
+        transform: translateX(-200%);
         opacity: 0;
     }
 }
 
-template {
+template,
+[hidden] {
     display: none !important;
 }

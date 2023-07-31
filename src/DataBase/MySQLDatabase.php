@@ -71,6 +71,23 @@ class MySQLDatabase implements \IteratorAggregate, \Countable
         return $stmt->execute();
     }
 
+    public function getLastRecords($id): array
+    {
+        $stmt = $this->connection->prepare(
+            sprintf(
+                'SELECT * FROM %s WHERE id > ?',
+                $this->name
+            )
+        );
+
+        if ($stmt->execute([$id]))
+        {
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        }
+
+        return [];
+    }
+
     public function updateRecord($id, array $record): bool
     {
         $this->entries        = null;
